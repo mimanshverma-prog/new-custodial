@@ -2,11 +2,15 @@
 
 A complete, self-hosted solution for sending bulk emails (1 Million+/day) without relying on expensive SaaS platforms like Mailchimp or Instantly.ai.
 
+**⚠️ Enterprise Architecture Note:**
+This repository provides the **Single Node Implementation** of the [Enterprise Distributed Architecture](ARCHITECTURE.md). For scaling to 1M+ emails/day in a production environment, please review the `ARCHITECTURE.md` document for details on clustering, IP pools, and queue management.
+
 **Features:**
 *   **Backend:** Python (FastAPI) + SQLite (for high speed).
 *   **Frontend:** Vue.js Dashboard (Upload CSV, Create HTML Campaigns).
 *   **Sending Engine:** Local Postfix Server (Optimized for Bulk).
 *   **Reputation Management:** Throttling built-in to warm up IPs.
+*   **Documentation:** Comprehensive [Architecture Guide](ARCHITECTURE.md).
 
 ## Prerequisites
 
