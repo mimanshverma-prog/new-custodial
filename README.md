@@ -9,8 +9,9 @@ This repository provides the **Single Node Implementation** of the [Enterprise D
 *   **Backend:** Python (FastAPI) + SQLite (for high speed).
 *   **Frontend:** Vue.js Dashboard (Upload CSV, Create HTML Campaigns).
 *   **Sending Engine:** Local Postfix Server (Optimized for Bulk).
-*   **Reputation Management:** Throttling built-in to warm up IPs.
+*   **Reputation Management:** Configurable rate limiting for IP warmup.
 *   **Documentation:** Comprehensive [Architecture Guide](ARCHITECTURE.md).
+*   **Warm-Up:** Step-by-step [Warm-Up Schedule](WARMUP_SCHEDULE.md).
 
 ## Prerequisites
 
@@ -69,11 +70,7 @@ The dashboard will be available at `http://<YOUR_VPS_IP>:8000`.
 The system will queue emails and send them via Postfix.
 
 ## Warm-up Strategy (Don't skip!)
-*   Day 1: 500 emails
-*   Day 2: 1,000 emails
-*   Day 3: 2,500 emails
-*   Day 4: 5,000 emails
-*   ...Double every few days until you reach 1M.
+Please refer to [WARMUP_SCHEDULE.md](WARMUP_SCHEDULE.md) for the detailed day-by-day plan to reach 1 Million emails/day safely.
 
 ## License
 MIT

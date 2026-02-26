@@ -78,6 +78,16 @@ def send_email_task(campaign_id: int):
         smtp_server = os.getenv("SMTP_SERVER", "localhost")
         smtp_port = int(os.getenv("SMTP_PORT", 25))
 
+        # Rate Limiting Configuration
+        # Use a safe default (1.0 email/sec) if not set.
+        # For warmup, this might be as low as 0.01 (1 email every 100s).
+        try:
+            emails_per_second = float(os.getenv("EMAILS_PER_SECOND", 1.0))
+        except ValueError:
+            emails_per_second = 1.0
+
+        delay = 1.0 / emails_per_second if emails_per_second > 0 else 0
+
         sent_count = 0
         failed_count = 0
 
@@ -132,8 +142,7 @@ def send_email_task(campaign_id: int):
                     db.commit()
 
                     # Rate Limiting
-                    # Sleep for 0.1s to allow ~10 emails/sec max
-                    time.sleep(0.1)
+                    time.sleep(delay)
 
                 campaign.status = "completed"
                 db.commit()
