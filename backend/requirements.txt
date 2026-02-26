@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+aiosmtplib
+jinja2
+python-multipart
+aiofiles

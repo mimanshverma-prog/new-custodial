@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SMTP_SERVER=postfix
+      - SMTP_PORT=25
+    volumes:
+      - ./backend/app:/app/backend/app
+      - ./bulk_mailer.db:/app/bulk_mailer.db
+    depends_on:
+      - postfix
+
+  postfix:
+    image: mwader/postfix-relay
+    ports:
+      - "25:25"
+    environment:
+      - POSTFIX_myhostname=mail.yourdomain.com
+      - POSTFIX_mynetworks=10.0.0.0/8 172.0.0.0/8 192.168.0.0/16 127.0.0.0/8
+    # In production, use volumes for persistence
+    # volumes:
+    #   - ./postfix_data:/var/spool/postfix

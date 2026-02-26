@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Email Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="app" class="min-h-screen">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white p-6">
+            <h1 class="text-2xl font-bold mb-8">🚀 Bulk Mailer</h1>
+            <nav>
+                <a @click="currentView = 'dashboard'" :class="{'bg-gray-700': currentView === 'dashboard'}" class="block py-2 px-4 rounded mb-2 cursor-pointer hover:bg-gray-800">Dashboard</a>
+                <a @click="currentView = 'contacts'" :class="{'bg-gray-700': currentView === 'contacts'}" class="block py-2 px-4 rounded mb-2 cursor-pointer hover:bg-gray-800">Contacts</a>
+                <a @click="currentView = 'campaigns'" :class="{'bg-gray-700': currentView === 'campaigns'}" class="block py-2 px-4 rounded mb-2 cursor-pointer hover:bg-gray-800">Campaigns</a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 p-8">
+
+            <!-- Dashboard View -->
+            <div v-if="currentView === 'dashboard'">
+                <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded shadow">
+                        <h3 class="text-gray-500 mb-2">Total Contacts</h3>
+                        <p class="text-4xl font-bold" v-cloak>{% raw %}{{ stats.contacts }}{% endraw %}</p>
+                    </div>
+                    <div class="bg-white p-6 rounded shadow">
+                        <h3 class="text-gray-500 mb-2">Campaigns Sent</h3>
+                        <p class="text-4xl font-bold" v-cloak>{% raw %}{{ stats.campaigns }}{% endraw %}</p>
+                    </div>
+                    <div class="bg-white p-6 rounded shadow">
+                        <h3 class="text-gray-500 mb-2">Server Status</h3>
+                        <p class="text-green-500 text-xl font-bold">Online</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts View -->
+            <div v-if="currentView === 'contacts'">
+                <h2 class="text-3xl font-bold mb-6">Contacts</h2>
+
+                <div class="bg-white p-6 rounded shadow mb-6">
+                    <h3 class="text-xl font-bold mb-4">Upload CSV</h3>
+                    <input type="file" ref="fileInput" class="border p-2 rounded w-full mb-4">
+                    <button @click="uploadContacts" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Upload</button>
+                </div>
+
+                <div class="bg-white p-6 rounded shadow">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="p-2">Email</th>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="contact in contacts" :key="contact.id" class="border-b">
+                                <td class="p-2" v-cloak>{% raw %}{{ contact.email }}{% endraw %}</td>
+                                <td class="p-2" v-cloak>{% raw %}{{ contact.name }}{% endraw %}</td>
+                                <td class="p-2">
+                                    <span v-if="contact.unsubscribed" class="text-red-500">Unsubscribed</span>
+                                    <span v-else class="text-green-500">Active</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Campaigns View -->
+            <div v-if="currentView === 'campaigns'">
+                <h2 class="text-3xl font-bold mb-6">Campaigns</h2>
+
+                <!-- Create Campaign Form -->
+                <div class="bg-white p-6 rounded shadow mb-6">
+                    <h3 class="text-xl font-bold mb-4">Create New Campaign</h3>
+                    <div class="mb-4">
+                        <label class="block mb-2">Campaign Name</label>
+                        <input v-model="newCampaign.name" type="text" class="w-full border p-2 rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2">Subject</label>
+                        <input v-model="newCampaign.subject" type="text" class="w-full border p-2 rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2">Body (HTML)</label>
+                        <textarea v-model="newCampaign.body" rows="5" class="w-full border p-2 rounded"></textarea>
+                        <p class="text-sm text-gray-500 mt-1">Use {% raw %}{{name}}{% endraw %} for personalization.</p>
+                    </div>
+                    <button @click="createCampaign" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Draft</button>
+                </div>
+
+                <!-- List Campaigns -->
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="text-xl font-bold mb-4">Recent Campaigns</h3>
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="p-2">ID</th>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">Subject</th>
+                                <th class="p-2">Status</th>
+                                <th class="p-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="campaign in campaigns" :key="campaign.id" class="border-b">
+                                <td class="p-2" v-cloak>{% raw %}{{ campaign.id }}{% endraw %}</td>
+                                <td class="p-2" v-cloak>{% raw %}{{ campaign.name }}{% endraw %}</td>
+                                <td class="p-2" v-cloak>{% raw %}{{ campaign.subject }}{% endraw %}</td>
+                                <td class="p-2">
+                                    <span :class="{
+                                        'bg-gray-200 px-2 py-1 rounded': campaign.status === 'draft',
+                                        'bg-blue-200 text-blue-800 px-2 py-1 rounded': campaign.status === 'sending',
+                                        'bg-green-200 text-green-800 px-2 py-1 rounded': campaign.status === 'completed',
+                                        'bg-red-200 text-red-800 px-2 py-1 rounded': campaign.status === 'failed'
+                                    }" v-cloak>{% raw %}{{ campaign.status }}{% endraw %}</span>
+                                </td>
+                                <td class="p-2">
+                                    <button v-if="campaign.status === 'draft'" @click="sendCampaign(campaign.id)" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Send</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    currentView: 'dashboard',
+                    stats: { contacts: 0, campaigns: 0 },
+                    contacts: [],
+                    campaigns: [],
+                    newCampaign: { name: '', subject: '', body: '' }
+                }
+            },
+            mounted() {
+                this.fetchStats();
+                this.fetchContacts();
+                this.fetchCampaigns();
+            },
+            methods: {
+                async fetchStats() {
+                    // Quick hack to get counts, usually a dedicated stats endpoint is better
+                    const c = await axios.get('/contacts?limit=1');
+                    const cp = await axios.get('/campaigns?limit=1');
+                    // In a real app, I'd implement a stats endpoint. For now, this is static or derived.
+                    // Let's just fetch lists for now.
+                    this.fetchContacts();
+                    this.fetchCampaigns();
+                },
+                async fetchContacts() {
+                    const res = await axios.get('/contacts');
+                    this.contacts = res.data;
+                    this.stats.contacts = this.contacts.length;
+                },
+                async fetchCampaigns() {
+                    const res = await axios.get('/campaigns');
+                    this.campaigns = res.data;
+                    this.stats.campaigns = this.campaigns.length;
+                },
+                async uploadContacts() {
+                    const file = this.$refs.fileInput.files[0];
+                    if(!file) return alert("Select a file!");
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        await axios.post('/contacts/upload', formData);
+                        alert("Contacts uploaded!");
+                        this.fetchContacts();
+                    } catch(e) {
+                        alert("Upload failed");
+                    }
+                },
+                async createCampaign() {
+                    try {
+                        await axios.post('/campaigns', this.newCampaign);
+                        alert("Campaign Created!");
+                        this.newCampaign = { name: '', subject: '', body: '' };
+                        this.fetchCampaigns();
+                    } catch(e) {
+                        alert("Failed to create campaign");
+                    }
+                },
+                async sendCampaign(id) {
+                    if(!confirm("Are you sure you want to start sending?")) return;
+                    try {
+                        await axios.post(`/campaigns/${id}/send`);
+                        alert("Sending started!");
+                        this.fetchCampaigns();
+                    } catch(e) {
+                        alert("Failed to start sending");
+                    }
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
