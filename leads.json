@@ -1,0 +1,46 @@
+[
+    {
+        "person_data": {
+            "full_name": "John Doe",
+            "job_title": "CTO",
+            "linkedin_profile_url": "https://www.linkedin.com/in/johndoe/"
+        },
+        "company_data": {
+            "company_name": "TechCorp",
+            "website": "https://www.techcorp.com",
+            "industry": "Software",
+            "company_size": "50-200",
+            "estimated_revenue": "0M-0M",
+            "location": "United States",
+            "recent_funding": "Unknown",
+            "hiring_activity": "Yes"
+        },
+        "contact_data": {
+            "verified_work_email": "john.doe@techcorp.com",
+            "email_verification_status": "Valid",
+            "business_domain": "techcorp.com"
+        }
+    },
+    {
+        "person_data": {
+            "full_name": "Jane Doe",
+            "job_title": "Chief Technology Officer",
+            "linkedin_profile_url": "https://www.linkedin.com/in/janedoe/"
+        },
+        "company_data": {
+            "company_name": "Acme Inc",
+            "website": "https://www.acmeinc.com",
+            "industry": "Software",
+            "company_size": "50-200",
+            "estimated_revenue": "0M-0M",
+            "location": "United States",
+            "recent_funding": "Unknown",
+            "hiring_activity": "Yes"
+        },
+        "contact_data": {
+            "verified_work_email": "jane.doe@acmeinc.com",
+            "email_verification_status": "Valid",
+            "business_domain": "acmeinc.com"
+        }
+    }
+]
