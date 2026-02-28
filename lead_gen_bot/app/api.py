@@ -8,6 +8,7 @@ import os
 from main import LeadGeneratorEngine
 from mailer import ZoraMailer
 from responder import ZoraIMAPListener
+from social_outreach import ZoraSocialEngine
 
 app = FastAPI(title="Zora Engine", description="Omni-channel Lead Generation & Mass Mailer", version="1.0.0")
 
@@ -28,6 +29,14 @@ campaign_status = {
     "target": 0,
     "emails_sent": 0,
     "current_domain": ""
+}
+
+social_campaign_status = {
+    "is_running": False,
+    "reddit_posts_success": [],
+    "reddit_posts_failed": [],
+    "twitter_thread_url": "",
+    "linkedin_messages_sent": 0
 }
 
 @app.get("/", response_class=HTMLResponse)
@@ -99,6 +108,76 @@ async def start_campaign(background_tasks: BackgroundTasks, payload: dict):
 
     background_tasks.add_task(run_campaign_task, industry, country, job_title, target)
     return {"message": "Zora Engine Started!"}
+
+def run_social_task(credentials, platforms, content):
+    """
+    Background worker that executes the massive social media outreach engine.
+    """
+    global social_campaign_status
+    social_campaign_status["is_running"] = True
+    social_campaign_status["reddit_posts_success"] = []
+    social_campaign_status["reddit_posts_failed"] = []
+    social_campaign_status["twitter_thread_url"] = ""
+    social_campaign_status["linkedin_messages_sent"] = 0
+
+    import asyncio
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    try:
+        engine = ZoraSocialEngine(credentials)
+
+        # Concurrently execute selected platforms
+        tasks = []
+        if "reddit" in platforms:
+            tasks.append(engine.post_to_reddit(content.get("subreddits", ["startups"]), content["reddit_title"], content["reddit_body"]))
+        if "twitter" in platforms:
+            tasks.append(engine.post_to_twitter(content["twitter_text"]))
+        if "linkedin" in platforms:
+            tasks.append(engine.message_linkedin_connections(content["linkedin_message"]))
+
+        results = loop.run_until_complete(asyncio.gather(*tasks))
+
+        # Update status based on results
+        # (This is a simplified aggregation for the dashboard)
+        for r in results:
+            if isinstance(r, dict):
+                if "success" in r and isinstance(r["success"], list):
+                    social_campaign_status["reddit_posts_success"] = r["success"]
+                    social_campaign_status["reddit_posts_failed"] = r.get("failed", [])
+                elif "url" in r or "urls" in r:
+                    social_campaign_status["twitter_thread_url"] = r.get("url", "Thread Posted")
+                elif "success" in r and isinstance(r["success"], int):
+                    social_campaign_status["linkedin_messages_sent"] = r["success"]
+
+    except Exception as e:
+        print(f"Social Engine Error: {e}")
+    finally:
+        social_campaign_status["is_running"] = False
+        loop.close()
+
+@app.post("/api/social/start")
+async def start_social_campaign(background_tasks: BackgroundTasks, payload: dict):
+    """
+    Starts the Zora Social Media Outreach engine.
+    Expected payload format matches ZoraSocialEngine credentials + content configuration.
+    """
+    if social_campaign_status["is_running"]:
+        return {"error": "A social campaign is already running."}
+
+    credentials = payload.get("credentials", {})
+    platforms = payload.get("platforms", [])
+    content = payload.get("content", {})
+
+    background_tasks.add_task(run_social_task, credentials, platforms, content)
+    return {"message": "Zora Social Engine Started!"}
+
+@app.get("/api/social/status")
+async def get_social_status():
+    """
+    API endpoint for the frontend to poll social campaign status.
+    """
+    return social_campaign_status
 
 if __name__ == "__main__":
     # Start the Zora backend server
