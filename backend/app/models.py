@@ -31,9 +31,10 @@ class SendingLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     campaign_id = Column(Integer, ForeignKey("campaigns.id"))
     contact_id = Column(Integer, ForeignKey("contacts.id"))
-    status = Column(String) # sent, failed
+    status = Column(String) # sending, sent, failed
     error_message = Column(Text, nullable=True)
     sent_at = Column(DateTime, default=datetime.utcnow)
+    opened_at = Column(DateTime, nullable=True)
 
     campaign = relationship("Campaign")
     contact = relationship("Contact")

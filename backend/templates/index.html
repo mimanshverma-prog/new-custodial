@@ -107,6 +107,7 @@
                                 <th class="p-2">ID</th>
                                 <th class="p-2">Name</th>
                                 <th class="p-2">Subject</th>
+                                <th class="p-2">Stats</th>
                                 <th class="p-2">Status</th>
                                 <th class="p-2">Actions</th>
                             </tr>
@@ -116,6 +117,10 @@
                                 <td class="p-2" v-cloak>{% raw %}{{ campaign.id }}{% endraw %}</td>
                                 <td class="p-2" v-cloak>{% raw %}{{ campaign.name }}{% endraw %}</td>
                                 <td class="p-2" v-cloak>{% raw %}{{ campaign.subject }}{% endraw %}</td>
+                                <td class="p-2 text-sm">
+                                    <span class="text-gray-600 block" v-cloak>Sent: {% raw %}{{ campaign.sent_count }}{% endraw %}</span>
+                                    <span class="text-green-600 font-bold block" v-cloak>Opened: {% raw %}{{ campaign.opened_count }}{% endraw %}</span>
+                                </td>
                                 <td class="p-2">
                                     <span :class="{
                                         'bg-gray-200 px-2 py-1 rounded': campaign.status === 'draft',
