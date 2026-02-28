@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zora Enterprise Omni-Channel Engine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .zora-brand { font-weight: 800; font-size: 2rem; color: #2d3748; }
+        .zora-tag { color: #4a5568; font-size: 1.1rem; }
+        .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none; }
+        .metric-card { text-align: center; padding: 20px; }
+        .metric-val { font-size: 2.5rem; font-weight: 700; color: #3182ce; }
+        .metric-label { font-size: 0.9rem; text-transform: uppercase; color: #718096; letter-spacing: 1px; }
+        .btn-start { background-color: #3182ce; border: none; font-weight: 600; padding: 12px; }
+        .btn-start:hover { background-color: #2b6cb0; }
+        #progressContainer { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <div class="zora-brand">Zora Engine ⚡️</div>
+            <div class="zora-tag">Omni-Channel Lead Generation & Domain-Rotated Mass Mailer</div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card metric-card">
+                    <div class="metric-val" id="valLeads">0</div>
+                    <div class="metric-label">Verified Leads Found</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card">
+                    <div class="metric-val" id="valTarget">100,000</div>
+                    <div class="metric-label">Target Capacity</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card">
+                    <div class="metric-val text-success" id="valStatus">Idle</div>
+                    <div class="metric-label">Engine Status</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card p-4">
+                    <h5 class="mb-4">Launch Campaign</h5>
+                    <form id="campaignForm">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Target Job Title</label>
+                                <input type="text" class="form-control" id="jobTitle" value="CTO" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Industry</label>
+                                <input type="text" class="form-control" id="industry" value="Software" required>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col">
+                                <label class="form-label">Country/Location</label>
+                                <input type="text" class="form-control" id="country" value="United States" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Total Leads Target</label>
+                                <input type="number" class="form-control" id="targetCount" value="100000" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 btn-start" id="startBtn">Start Extraction & Mailing Engine</button>
+                    </form>
+
+                    <div id="progressContainer" class="mt-4 text-center">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <h5 class="text-primary">Engine Running...</h5>
+                        <p class="text-muted">Searching LinkedIn, X (Twitter), and Reddit.</p>
+                        <p class="text-muted">Bypassing restrictions and finding verified emails in real-time.</p>
+                        <div class="progress mt-3">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('campaignForm');
+        const startBtn = document.getElementById('startBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const valLeads = document.getElementById('valLeads');
+        const valStatus = document.getElementById('valStatus');
+        const progressBar = document.getElementById('progressBar');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                job_title: document.getElementById('jobTitle').value,
+                industry: document.getElementById('industry').value,
+                country: document.getElementById('country').value,
+                target: parseInt(document.getElementById('targetCount').value)
+            };
+
+            const res = await fetch('/api/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if(data.error) {
+                alert(data.error);
+                return;
+            }
+
+            form.style.display = 'none';
+            progressContainer.style.display = 'block';
+            startPolling();
+        });
+
+        function startPolling() {
+            setInterval(async () => {
+                const res = await fetch('/api/status');
+                const status = await res.json();
+
+                valLeads.innerText = status.leads_found.toLocaleString();
+                document.getElementById('valTarget').innerText = status.target.toLocaleString();
+
+                if (status.is_running) {
+                    valStatus.innerText = "Extracting...";
+                    valStatus.className = "metric-val text-warning";
+
+                    if (status.target > 0) {
+                        const pct = Math.min((status.leads_found / status.target) * 100, 100);
+                        progressBar.style.width = pct + "%";
+                    }
+                } else {
+                    valStatus.innerText = "Completed";
+                    valStatus.className = "metric-val text-success";
+                    progressContainer.innerHTML = '<h5 class="text-success mt-4">Campaign Complete!</h5><p>Check <b>leads.json</b> and <b>leads.csv</b> on your server.</p>';
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -67,10 +67,17 @@ class LeadGeneratorEngine:
         # Base query
         queries.append(f'"{job_title}" "{industry}" "{location}" site:linkedin.com/in')
 
+        # OMNI-CHANNEL DISCOVERY
+        # Add Twitter/X and Reddit queries to expand the massive pool
+        queries.append(f'"{job_title}" "{industry}" "{location}" site:twitter.com')
+        queries.append(f'"{job_title}" "{industry}" "{location}" site:reddit.com')
+
         # Alphabet expansion (e.g., find all CTOs in Tech where name starts with A)
         for letter1 in alphabet:
             queries.append(f'"{letter1}" "{job_title}" "{industry}" "{location}" site:linkedin.com/in')
-            # 2-letter permutations for deep scraping
+            queries.append(f'"{letter1}" "{job_title}" "{industry}" "{location}" site:x.com')
+
+            # 2-letter permutations for extremely deep scraping
             for letter2 in alphabet:
                 queries.append(f'"{letter1}{letter2}" "{job_title}" "{industry}" "{location}" site:linkedin.com/in')
 
