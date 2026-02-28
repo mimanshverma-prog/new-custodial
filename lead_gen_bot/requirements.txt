@@ -2,3 +2,4 @@ duckduckgo-search
 pydantic
 dnspython
 email-validator
+pandas
