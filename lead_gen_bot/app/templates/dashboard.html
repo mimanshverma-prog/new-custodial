@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zora Enterprise Omni-Channel Engine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .zora-brand { font-weight: 800; font-size: 2.2rem; color: #2d3748; }
+        .zora-tag { color: #4a5568; font-size: 1.1rem; }
+        .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none; }
+        .metric-card { text-align: center; padding: 20px; }
+        .metric-val { font-size: 2.5rem; font-weight: 700; color: #3182ce; }
+        .metric-label { font-size: 0.9rem; text-transform: uppercase; color: #718096; letter-spacing: 1px; }
+        .btn-start { background-color: #3182ce; border: none; font-weight: 600; padding: 12px; }
+        .btn-start:hover { background-color: #2b6cb0; }
+        #progressContainer, #socialProgressContainer { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <div class="zora-brand">Zora Engine ⚡️</div>
+            <div class="zora-tag">Mass Lead Generation & Social Media Automation Platform</div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4" id="zoraTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold" id="leads-tab" data-bs-toggle="tab" data-bs-target="#leads" type="button" role="tab" aria-selected="true">1. Email Lead Extraction</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab" aria-selected="false">2. Social Mass Outreach</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Email Leads Tab -->
+            <div class="tab-pane fade show active" id="leads" role="tabpanel" aria-labelledby="leads-tab">
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card metric-card">
+                            <div class="metric-val" id="valLeads">0</div>
+                            <div class="metric-label">Verified Leads Found</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card">
+                            <div class="metric-val" id="valTarget">100,000</div>
+                            <div class="metric-label">Target Capacity</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card metric-card">
+                            <div class="metric-val text-success" id="valStatus">Idle</div>
+                            <div class="metric-label">Engine Status</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card p-4">
+                            <h5 class="mb-4">Launch Email Lead Campaign</h5>
+                            <form id="campaignForm">
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label class="form-label">Target Job Title</label>
+                                        <input type="text" class="form-control" id="jobTitle" value="CTO" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Industry</label>
+                                        <input type="text" class="form-control" id="industry" value="Software" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col">
+                                        <label class="form-label">Country/Location</label>
+                                        <input type="text" class="form-control" id="country" value="United States" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Total Leads Target</label>
+                                        <input type="number" class="form-control" id="targetCount" value="100000" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 btn-start" id="startBtn">Start Extraction Engine</button>
+                            </form>
+
+                            <div id="progressContainer" class="mt-4 text-center">
+                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                <h5 class="text-primary">Engine Running...</h5>
+                                <p class="text-muted">Searching LinkedIn, X (Twitter), and Reddit.</p>
+                                <p class="text-muted">Bypassing restrictions and finding verified emails in real-time.</p>
+                                <div class="progress mt-3">
+                                    <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Outreach Tab -->
+            <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
+                <div class="row">
+                    <div class="col-md-10 mx-auto">
+                        <div class="card p-4">
+                            <h5 class="mb-4 text-primary">Start Mass Social Campaign (X, Reddit, LinkedIn)</h5>
+
+                            <form id="socialForm">
+                                <!-- Platforms Checklist -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Select Platforms to Automate:</label>
+                                    <div class="d-flex gap-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="twitter" id="platX" checked>
+                                            <label class="form-check-label" for="platX">X (Twitter) Threads</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="reddit" id="platReddit" checked>
+                                            <label class="form-check-label" for="platReddit">Reddit Mass-Post</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="linkedin" id="platLinkedin">
+                                            <label class="form-check-label" for="platLinkedin">LinkedIn Auto-DMs</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <!-- Credentials Box -->
+                                    <div class="col-md-6 border-end pe-4">
+                                        <h6 class="text-secondary">Platform Credentials (API Keys/Cookies)</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label" style="font-size:0.85rem">X/Twitter Bearer Token or Keys (JSON format)</label>
+                                            <input type="password" class="form-control form-control-sm" id="credTwitter" placeholder='{"api_key": "...", "api_secret": "...", ...}'>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" style="font-size:0.85rem">Reddit PRAW Credentials (JSON format)</label>
+                                            <input type="password" class="form-control form-control-sm" id="credReddit" placeholder='{"client_id": "...", "client_secret": "...", ...}'>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" style="font-size:0.85rem">LinkedIn Credentials (JSON format)</label>
+                                            <input type="password" class="form-control form-control-sm" id="credLinkedin" placeholder='{"username": "...", "password": "..."}'>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">Zora encrypts credentials and executes them locally on your server.</small>
+                                    </div>
+
+                                    <!-- Content Box -->
+                                    <div class="col-md-6 ps-4">
+                                        <h6 class="text-secondary">Marketing Content</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label" style="font-size:0.85rem">Thread Text (X/Twitter) & LinkedIn DM</label>
+                                            <textarea class="form-control" id="contentGeneral" rows="4" placeholder="Type your 100k views viral thread or sales pitch here... Zora will auto-split it if it's too long."></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" style="font-size:0.85rem">Reddit Targets (comma separated)</label>
+                                            <input type="text" class="form-control form-control-sm" id="redditTargets" value="startups, SaaS, entrepreneur">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100 fw-bold py-3" id="startSocialBtn">🚀 Launch Omni-Channel Automation</button>
+                            </form>
+
+                            <!-- Social Progress Monitor -->
+                            <div id="socialProgressContainer" class="mt-4 p-4 border rounded bg-light">
+                                <h5 class="text-success mb-3">⚡️ Social Engine Executing...</h5>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <h6>Reddit Posts</h6>
+                                        <h3 class="text-danger" id="statReddit">0</h3>
+                                    </div>
+                                    <div class="col border-start border-end">
+                                        <h6>X Threads</h6>
+                                        <h3 class="text-primary" id="statX">0</h3>
+                                    </div>
+                                    <div class="col">
+                                        <h6>LinkedIn DMs</h6>
+                                        <h3 class="text-info" id="statLi">0</h3>
+                                    </div>
+                                </div>
+                                <div id="socialLogs" class="mt-3 text-muted" style="font-family: monospace; font-size: 0.85rem;">Waiting for logs...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Email Campaign Logic ---
+        const form = document.getElementById('campaignForm');
+        const startBtn = document.getElementById('startBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const valLeads = document.getElementById('valLeads');
+        const valStatus = document.getElementById('valStatus');
+        const progressBar = document.getElementById('progressBar');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                job_title: document.getElementById('jobTitle').value,
+                industry: document.getElementById('industry').value,
+                country: document.getElementById('country').value,
+                target: parseInt(document.getElementById('targetCount').value)
+            };
+
+            const res = await fetch('/api/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if(data.error) return alert(data.error);
+
+            form.style.display = 'none';
+            progressContainer.style.display = 'block';
+
+            setInterval(async () => {
+                const res = await fetch('/api/status');
+                const status = await res.json();
+
+                valLeads.innerText = status.leads_found.toLocaleString();
+                document.getElementById('valTarget').innerText = status.target.toLocaleString();
+
+                if (status.is_running) {
+                    valStatus.innerText = "Extracting...";
+                    valStatus.className = "metric-val text-warning";
+                    if (status.target > 0) progressBar.style.width = Math.min((status.leads_found / status.target) * 100, 100) + "%";
+                } else {
+                    valStatus.innerText = "Completed";
+                    valStatus.className = "metric-val text-success";
+                    progressContainer.innerHTML = '<h5 class="text-success mt-4">Campaign Complete!</h5><p>Check <b>leads.json</b> and <b>leads.csv</b> on your server.</p>';
+                }
+            }, 3000);
+        });
+
+        // --- Social Campaign Logic ---
+        const socialForm = document.getElementById('socialForm');
+        const socialProg = document.getElementById('socialProgressContainer');
+
+        socialForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect platforms
+            let platforms = [];
+            if(document.getElementById('platX').checked) platforms.push('twitter');
+            if(document.getElementById('platReddit').checked) platforms.push('reddit');
+            if(document.getElementById('platLinkedin').checked) platforms.push('linkedin');
+
+            // Build payload safely parsing JSON blocks if provided
+            let credentials = {};
+            try { if(document.getElementById('credTwitter').value) credentials.twitter = JSON.parse(document.getElementById('credTwitter').value); } catch(e){}
+            try { if(document.getElementById('credReddit').value) credentials.reddit = JSON.parse(document.getElementById('credReddit').value); } catch(e){}
+            try { if(document.getElementById('credLinkedin').value) credentials.linkedin = JSON.parse(document.getElementById('credLinkedin').value); } catch(e){}
+
+            const generalText = document.getElementById('contentGeneral').value;
+
+            const payload = {
+                platforms: platforms,
+                credentials: credentials,
+                content: {
+                    twitter_text: generalText,
+                    linkedin_message: generalText,
+                    reddit_title: "Quick Question from a Founder",
+                    reddit_body: generalText,
+                    subreddits: document.getElementById('redditTargets').value.split(',').map(s=>s.trim())
+                }
+            };
+
+            const res = await fetch('/api/social/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if(data.error) return alert(data.error);
+
+            socialForm.style.display = 'none';
+            socialProg.style.display = 'block';
+
+            setInterval(async () => {
+                const sres = await fetch('/api/social/status');
+                const stat = await sres.json();
+
+                document.getElementById('statReddit').innerText = stat.reddit_posts_success.length;
+                document.getElementById('statX').innerText = stat.twitter_thread_url ? "1" : "0";
+                document.getElementById('statLi').innerText = stat.linkedin_messages_sent;
+
+                if(!stat.is_running && stat.twitter_thread_url) {
+                    document.getElementById('socialLogs').innerHTML = `<b>Finished!</b><br>X Thread: <a href='${stat.twitter_thread_url}' target='_blank'>Link</a>`;
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

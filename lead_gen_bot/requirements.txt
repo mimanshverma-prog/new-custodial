@@ -1,0 +1,12 @@
+duckduckgo-search
+pydantic
+dnspython
+email-validator
+pandas
+fastapi
+uvicorn
+jinja2
+python-multipart
+tweepy
+praw
+linkedin-api
